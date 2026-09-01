@@ -42,7 +42,6 @@ Parsed_Data AS (
         `Satisfaction_Upward`,
         `Satisfaction_Learning`,
         `Q7 - How difficult was it for you to break into Data?`,
-        `Q8_Most_Important_Thing`,
         `Q9 - Male/Female?`,
         Age,
         Clean_Date,
@@ -90,7 +89,7 @@ Parsed_Data AS (
             WHEN '86k-105k' THEN 105000
             WHEN '106k-125k' THEN 125000
             WHEN '125k-150k' THEN 150000
-            WHEN '150k-225k' THEN 150000
+            WHEN '150k-225k' THEN 225000
             WHEN '225k+' THEN 250000
             ELSE NULL
         END AS max_salary,
@@ -99,11 +98,12 @@ Parsed_Data AS (
         CASE 
             WHEN LOWER(Raw_Language) LIKE '%python%' THEN 'Python'
             WHEN LOWER(Raw_Language) LIKE '%sql%' THEN 'SQL'
-            WHEN LOWER(Raw_Language) LIKE '%r%' AND LOWER(Raw_Language) NOT LIKE '%dax%' THEN 'R'
             WHEN LOWER(Raw_Language) LIKE '%dax%' OR LOWER(Raw_Language) LIKE '%power query%' THEN 'Power Query / DAX'
-            WHEN LOWER(Raw_Language) LIKE '%c%' THEN 'C / C++'
             WHEN LOWER(Raw_Language) LIKE '%javascript%' THEN 'JavaScript'
-            WHEN LOWER(Raw_Language) LIKE '%none%' THEN 'None'
+            WHEN LOWER(TRIM(REPLACE(REPLACE(Raw_Language, 'Other (Please Specify):', ''), 'Other:', ''))) = 'r' THEN 'R'
+            WHEN LOWER(TRIM(REPLACE(REPLACE(Raw_Language, 'Other (Please Specify):', ''), 'Other:', ''))) IN ('c', 'c++', 'c/c++', 'c#') THEN 'C / C++'
+            WHEN LOWER(Raw_Language) LIKE '%none%'
+              OR TRIM(REPLACE(REPLACE(Raw_Language, 'Other (Please Specify):', ''), 'Other:', '')) = '' THEN 'None'
             ELSE 'Other'
         END AS Favorite_Language,
 
@@ -147,7 +147,16 @@ Parsed_Data AS (
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%supply chain%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%wholesale%' THEN 'Supply Chain'
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%consumer goods%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%cosmetics%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%culinary%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%poultry%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%direct marketing%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%home and living%' THEN 'Consumer Goods'
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%renewable%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%urbanism%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%energy%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%oil%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%gas%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%power generation%' THEN 'Energy & Utilities'
-            WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%tech%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%it%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%software%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%data insight%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%electronics%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%sensors%' THEN 'Tech / IT'
+            WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%tech%'
+              OR LOWER(TRIM(`Q4 - What Industry do you work in?`)) = 'it'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE 'it %'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '% it'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '% it %'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%information technology%'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%software%'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%data insight%'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%electronics%'
+              OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%sensors%' THEN 'Tech / IT'
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%finance%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%bank%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%invest%' THEN 'Finance / Banking'
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%health%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%med%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%pharma%' THEN 'Healthcare'
             WHEN LOWER(`Q4 - What Industry do you work in?`) LIKE '%edu%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%school%' OR LOWER(`Q4 - What Industry do you work in?`) LIKE '%university%' THEN 'Education'
@@ -220,6 +229,7 @@ SELECT
     Favorite_Language,
     Clean_Date,
     Age,
+    Age AS `Q10 - Current Age`,
     Age_Brackets,
     Clean_Ethnicity
 FROM Parsed_Data;
