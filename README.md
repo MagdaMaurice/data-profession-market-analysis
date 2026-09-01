@@ -27,7 +27,8 @@ The raw survey export was cleaned and standardized in MySQL, then loaded into Po
 │   └── data_cleaning.sql            # MySQL script used to clean the raw data
 ├── screenshots/
 │   └── dashboard_demo.gif           # Walkthrough of the Power BI dashboard
-├── Data_Profession_Market_Analysis.pbix   # Power BI dashboard file built on the cleaned dataset
+├── pbix/
+│   └── Data_Profession_Market_Analysis.pbix   # Power BI dashboard file built on the cleaned dataset
 └── README.md
 ```
 
